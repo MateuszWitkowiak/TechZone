@@ -1,0 +1,88 @@
+.admin-panel {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    background: #f7f8fa;
+    min-height: 100vh;
+}
+.admin-categories {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.admin-categories button {
+    background: #2949d3;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.admin-categories button:hover {
+    background: #182c69;
+}
+.admin-message {
+    margin-bottom: 20px;
+    color: #e74c3c;
+    font-weight: bold;
+}
+.product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: flex-start;
+}
+.admin-add-product form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+}
+.admin-add-product h2 {
+    margin-bottom: 10px;
+}
+.admin-add-product input,
+.admin-add-product textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    font-size: 15px;
+    border-radius: 5px;
+    border: 1px solid #bbb;
+    outline: none;
+}
+.admin-add-product form {
+    width: 100%;
+    max-width: 400px;      /* Szerokość maksymalna formularza */
+}
+.admin-add-product button {
+    background: #2949d3;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.admin-add-product {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: center;
+    align-items: center;
+}
+.admin-add-product button:hover {
+    background: #182c69;
+}
+
+.admin-add-product .cancel-button {
+    background: orangered !important;
+    color: #fff;
+}
+.admin-add-product .cancel-button:hover {
+    background: red !important;
+}
