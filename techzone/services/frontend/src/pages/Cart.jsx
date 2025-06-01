@@ -11,7 +11,6 @@ export default function Cart() {
   const { keycloak } = useKeycloak();
   const navigate = useNavigate();
 
-  // Automatycznie pobieraj e-mail z tokena Keycloak
   const email = keycloak.tokenParsed?.email || "";
 
   useEffect(() => {
@@ -106,7 +105,6 @@ export default function Cart() {
         margin: "0 auto",
         padding: "0 16px 48px 16px"
       }}>
-        {/* Produkty po lewej */}
         <div style={{ flex: 2, maxWidth: 600 }}>
           {cartItems.length === 0 ? (
             <div style={{
@@ -201,7 +199,6 @@ export default function Cart() {
           )}
         </div>
 
-        {/* Podsumowanie po prawej */}
         <div style={{
           flex: 1,
           minWidth: 270,
@@ -227,7 +224,6 @@ export default function Cart() {
             </div>
           </div>
           <hr style={{ margin: "16px 0 22px 0", border: 0, borderTop: "1px solid #ececec" }} />
-          {/* Automatycznie pokazuj maila z Keycloaka */}
           <div style={{ marginBottom: 18 }}>
             <label style={{
               fontWeight: 500,

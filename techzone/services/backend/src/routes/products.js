@@ -18,18 +18,16 @@ router.get("/getProduct/:id", async (req, res) => {
     }
 })
 
-// Pobierz wszystkie produkty
 router.get("/getAll", async (req, res) => {
     try {
         const products = await Product.find();
         res.status(200).json(products);
     } catch (err) {
-        console.error("BŁĄD BACKEND:", err); // dodaj to!
+        console.error("BŁĄD BACKEND:", err);
         res.status(500).json({ message: "Server error: getting all products unavailable" });
     }
 });
 
-// Dodaj nowy produkt - tylko admin
 router.post("/addProduct", checkJwt, async (req, res) => {
     try {
         if (!req.user?.realm_access?.roles?.includes("admin")) {
@@ -61,7 +59,6 @@ router.post("/addProduct", checkJwt, async (req, res) => {
     }
 });
 
-// Usuń produkt z bazy - tylko admin 
 router.delete("/delete/:id", checkJwt, async (req, res) => {
     try {
         if (!req.user?.realm_access?.roles?.includes("admin")) {

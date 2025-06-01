@@ -24,6 +24,13 @@ function AdminPanel() {
     const [orderStatusUpdates, setOrderStatusUpdates] = useState({});
     const { keycloak } = useKeycloak();
 
+    const [orderStatusFilter, setOrderStatusFilter] = useState("");
+    const [orderSearch, setOrderSearch] = useState("");
+    const [productCategoryFilter, setProductCategoryFilter] = useState("");
+    const [productBrandFilter, setProductBrandFilter] = useState("");
+    const [productActiveFilter, setProductActiveFilter] = useState("");
+    const [productSearch, setProductSearch] = useState("");
+
     if (!keycloak.hasRealmRole('admin')) {
         window.location.replace("/")
     }
@@ -45,7 +52,6 @@ function AdminPanel() {
         }
     });
 
-    // --- Zamówienia ---
     const fetchOrders = async () => {
         setMessage("");
         try {
@@ -70,7 +76,6 @@ function AdminPanel() {
         }
     }
 
-    // --- Produkty ---
     const fetchProducts = async () => {
         setMessage("");
         try {
@@ -98,7 +103,6 @@ function AdminPanel() {
         }
     };
 
-    // --- Edycja produktu ---
     const handleEditProduct = (product) => {
         setEditingProduct(product);
         setProductForm({
@@ -213,7 +217,6 @@ function AdminPanel() {
         }
     };
 
-    // Rozwijanie/zwijanie szczegółów zamówienia
     const [expandedOrders, setExpandedOrders] = useState({});
     const toggleOrderDetails = (orderId) => {
         setExpandedOrders(prev => ({
@@ -221,6 +224,31 @@ function AdminPanel() {
             [orderId]: !prev[orderId]
         }));
     };
+
+    const filteredOrders = orders.filter(order => {
+        const statusMatch = orderStatusFilter === "" || (order.status && order.status.toLowerCase() === orderStatusFilter.toLowerCase());
+        const searchMatch =
+            orderSearch.trim() === "" ||
+            (order._id && order._id.toLowerCase().includes(orderSearch.toLowerCase())) ||
+            (order.userEmail && order.userEmail.toLowerCase().includes(orderSearch.toLowerCase())) ||
+            (order.userName && order.userName.toLowerCase().includes(orderSearch.toLowerCase()));
+        return statusMatch && searchMatch;
+    });
+
+    const filteredProducts = products.filter(product => {
+        const categoryMatch = !productCategoryFilter || product.category === productCategoryFilter;
+        const brandMatch = !productBrandFilter || product.brand.toLowerCase() === productBrandFilter.toLowerCase();
+        const activeMatch = !productActiveFilter || (productActiveFilter === "active" ? product.isActive : !product.isActive);
+        const searchMatch =
+            productSearch.trim() === "" ||
+            product.name.toLowerCase().includes(productSearch.toLowerCase()) ||
+            product.description.toLowerCase().includes(productSearch.toLowerCase()) ||
+            product.brand.toLowerCase().includes(productSearch.toLowerCase());
+        return categoryMatch && brandMatch && activeMatch && searchMatch;
+    });
+
+    const allCategories = Array.from(new Set(products.map(p => p.category)));
+    const allBrands = Array.from(new Set(products.map(p => p.brand)));
 
     return (
         <div className="admin-panel">
@@ -250,11 +278,27 @@ function AdminPanel() {
             {view === "orders" && (
                 <div className="admin-orders" style={{color: "black"}}>
                     <h2>Zamówienia</h2>
-                    {orders.length === 0 ? (
+                    <div style={{display: "flex", alignItems: "center", gap: 16, marginBottom: 14}}>
+                        <select value={orderStatusFilter} onChange={e => setOrderStatusFilter(e.target.value)}>
+                            <option value="">Wszystkie statusy</option>
+                            {orderStatusOptions.map(status => (
+                                <option key={status} value={status}>{status}</option>
+                            ))}
+                        </select>
+                        <input
+                            type="text"
+                            placeholder="Szukaj po ID, mailu lub nazwie klienta..."
+                            value={orderSearch}
+                            onChange={e => setOrderSearch(e.target.value)}
+                            style={{padding: 4, minWidth: 230}}
+                        />
+                        <button onClick={() => { setOrderStatusFilter(""); setOrderSearch(""); }}>Wyczyść filtry</button>
+                    </div>
+                    {filteredOrders.length === 0 ? (
                         <p>Brak zamówień.</p>
                     ) : (
                         <div className="admin-orders-list" >
-                            {orders.map(order => (
+                            {filteredOrders.map(order => (
                                 <div className={`order-card ${expandedOrders[order._id] ? "expanded" : ""}`} key={order._id}>
                                     <div className="order-summary-row" onClick={() => toggleOrderDetails(order._id)}>
                                         <div className="order-summary-col" title={order._id}>
@@ -292,7 +336,6 @@ function AdminPanel() {
                                             </button>
                                         </div>
                                     </div>
-
                                     {expandedOrders[order._id] && (
                                         <div className="order-details">
                                             <div style={{marginBottom: 6}}>
@@ -360,11 +403,38 @@ function AdminPanel() {
             {view === "products" && (
                 <div className="admin-products">
                     <div style={{color: "black", fontSize: "25px"}}><b>Produkty:</b></div>
+                    <div style={{display: "flex", alignItems: "center", gap: 12, marginBottom: 14, flexWrap: "wrap"}}>
+                        <select value={productCategoryFilter} onChange={e => setProductCategoryFilter(e.target.value)}>
+                            <option value="">Wszystkie kategorie</option>
+                            {allCategories.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                        <select value={productBrandFilter} onChange={e => setProductBrandFilter(e.target.value)}>
+                            <option value="">Wszystkie marki</option>
+                            {allBrands.map(brand => (
+                                <option key={brand} value={brand}>{brand}</option>
+                            ))}
+                        </select>
+                        <select value={productActiveFilter} onChange={e => setProductActiveFilter(e.target.value)}>
+                            <option value="">Aktywne i nieaktywne</option>
+                            <option value="active">Tylko aktywne</option>
+                            <option value="inactive">Tylko nieaktywne</option>
+                        </select>
+                        <input
+                            type="text"
+                            placeholder="Szukaj po nazwie, opisie, marce..."
+                            value={productSearch}
+                            onChange={e => setProductSearch(e.target.value)}
+                            style={{padding: 4, minWidth: 230}}
+                        />
+                        <button onClick={() => { setProductCategoryFilter(""); setProductBrandFilter(""); setProductActiveFilter(""); setProductSearch(""); }}>Wyczyść filtry</button>
+                    </div>
                     <div className="product-list">
-                        {products.length === 0 ? (
+                        {filteredProducts.length === 0 ? (
                             <p>Brak produktów.</p>
                         ) : (
-                            products.map(product => (
+                            filteredProducts.map(product => (
                                 <ProductCard
                                     key={product._id}
                                     product={product}

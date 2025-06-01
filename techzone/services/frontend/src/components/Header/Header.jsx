@@ -62,6 +62,7 @@ function Header() {
           placeholder="Szukaj produktów..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          style={{color: 'black'}}
         />
         <button className="search-button" type="submit" aria-label="Search">
           <Search className="search-icon" />

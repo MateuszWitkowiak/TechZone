@@ -9,9 +9,9 @@
   display: flex;
   flex-direction: row;
   gap: 1rem;
-  align-items: center; /* ✅ To jest kluczowe dla wyrównania */
+  align-items: center;
   justify-content: space-around;
-  min-height: 60px; /* ✅ Minimalna wysokość */
+  min-height: 60px;
 }
 
 .logo {
@@ -21,9 +21,9 @@
   cursor: pointer;
   transition: color 0.2s ease;
   flex-shrink: 0;
-  line-height: 1; /* ✅ Usuń dodatkową wysokość z line-height */
-  display: flex; /* ✅ Flex dla lepszego wyrównania */
-  align-items: center; /* ✅ Wycentruj w pionie */
+  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
 .logo:hover {
@@ -35,7 +35,7 @@
   flex: 1;
   max-width: 400px;
   margin: 0 2rem;
-  align-items: center; /* ✅ Wycentruj elementy search */
+  align-items: center;
 }
 
 .search-input {
@@ -50,7 +50,7 @@
   background-color: white;
   outline: none;
   font-size: 1rem;
-  box-sizing: border-box; /* ✅ Ważne dla prawidłowego sizing */
+  box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -150,8 +150,6 @@
   color: black;
 }
 
-
-/* Responsive design */
 @media (max-width: 768px) {
   .header {
     flex-wrap: wrap;

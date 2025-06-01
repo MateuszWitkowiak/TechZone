@@ -78,7 +78,6 @@ export default function ProductPage() {
         )}
       </div>
 
-      {/* Right side: Product details */}
       <div style={{
         flex: "1 1 50%",
         backgroundColor: "#f9f9f9",

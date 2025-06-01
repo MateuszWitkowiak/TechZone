@@ -45,7 +45,18 @@ services:
     volumes:
       - ./services/frontend:/app
       - /app/node_modules
-
+    
+  notification-service:
+    build: ./services/notification-service
+    env_file:
+      - ./services/notification-service/.env
+    depends_on:
+      - rabbitmq
+    networks:
+      - app-network
+    restart: unless-stopped
+    volumes:
+      - ./services/notification-service:/app
   keycloak:
     image: quay.io/keycloak/keycloak:23.0
     command: start-dev

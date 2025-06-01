@@ -32,7 +32,6 @@ function HomePage() {
     if (initialized) {
       fetchProducts();
     }
-    // eslint-disable-next-line
   }, [initialized]);
 
   const fetchProducts = async () => {

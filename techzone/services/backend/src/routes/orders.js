@@ -4,6 +4,7 @@ const router = express.Router();
 import mongoose from 'mongoose';
 import Product from "../models/Product.js";
 import checkJwt from "../middleware/checkJwt.js";
+import { sendOrderCreatedNotification, sendStatusUpdateNotification } from "../../utils/rabbitmq.js";
 
 // pobierz wszystkie zamówienia (dla admina)
 router.get("/getAll", checkJwt, (req, res, next) => {
@@ -92,6 +93,14 @@ router.post("/addOrder", checkJwt, async (req, res) => {
         await session.commitTransaction();
         session.endSession();
 
+        await sendOrderCreatedNotification({
+        email: req.user.email,
+        userName: req.user.preferred_username,
+        orderId: newOrder._id,
+        total: newOrder.total,
+        products: newOrder.products,
+        createdAt: newOrder.createdAt,
+        });
         res.status(201).json(newOrder);
     } catch (err) {
         await session.abortTransaction();
@@ -124,6 +133,7 @@ router.put("/updateStatus/:orderid", checkJwt, async (req, res) => {
         if (!order) {
             return res.status(404).json({ message: "Nie znaleziono zamówienia!" });
         }
+        await sendStatusUpdateNotification(order);
 
         res.status(200).json(order);
     } catch (err) {

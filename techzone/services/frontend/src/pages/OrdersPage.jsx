@@ -32,7 +32,6 @@ export default function OrdersPage() {
     fetchOrders();
   }, [keycloak]);
 
-  // Kolory statusów zamówienia
   const getStatusColor = (status) => {
     switch ((status || "").toLowerCase()) {
       case "pending":
