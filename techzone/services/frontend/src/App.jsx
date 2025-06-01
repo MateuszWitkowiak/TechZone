@@ -5,6 +5,7 @@ import Cart from './pages/Cart'
 import AdminPanel from './pages/AdminPanel';
 import OrdersPage from './pages/OrdersPage';
 import SearchPage from './pages/SearchPage';
+import ProductPage from './pages/ProductPage';
 import './App.css';
 
 function App() {
@@ -15,8 +16,9 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/cart" element={<Cart />}/>
           <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/orders/:user" element={<OrdersPage />} />
           <Route path="/search/:query" element={<SearchPage />} />
+          <Route path="/product/:productId" element={<ProductPage />} />
         </Routes>
       </Layout>
     </Router>

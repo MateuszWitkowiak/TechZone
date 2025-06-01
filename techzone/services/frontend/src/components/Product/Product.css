@@ -93,3 +93,7 @@
 .product-card-edit:hover {
     background: cyan;
 }
+
+h3 {
+    color: black;
+}

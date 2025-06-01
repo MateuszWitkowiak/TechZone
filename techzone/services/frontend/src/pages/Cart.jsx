@@ -1,12 +1,24 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import ProductCard from "../components/Product/Product";
+import { useKeycloak } from "@react-keycloak/web";
+import { useNavigate } from "react-router-dom";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
-  const [email, setEmail] = useState("");
   const [orderPlaced, setOrderPlaced] = useState(false);
 
+  const { keycloak } = useKeycloak();
+  const navigate = useNavigate();
+
+  // Automatycznie pobieraj e-mail z tokena Keycloak
+  const email = keycloak.tokenParsed?.email || "";
+
   useEffect(() => {
+    if (!keycloak.authenticated) {
+      navigate('/');
+      return;
+    }
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     const productMap = new Map();
     cart.forEach(product => {
@@ -17,22 +29,74 @@ export default function Cart() {
       }
     });
     setCartItems(Array.from(productMap.values()));
-  }, []);
+  }, [keycloak, navigate]);
 
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  const handleOrder = () => {
-    setOrderPlaced(true);
-    localStorage.setItem("cart", "[]");
+  const updateLocalStorage = (updatedItems) => {
+    const flatItems = updatedItems.flatMap(item =>
+      Array(item.quantity).fill({ ...item, quantity: undefined })
+    );
+    localStorage.setItem("cart", JSON.stringify(flatItems));
+    setCartItems(updatedItems);
     window.dispatchEvent(new Event("storage"));
   };
 
+  const increaseQuantity = (id) => {
+    const updatedItems = cartItems.map(item => {
+      if (item._id === id) {
+        if (item.quantity < item.stock) {
+          return { ...item, quantity: item.quantity + 1 };
+        }
+      }
+      return item;
+    });
+    updateLocalStorage(updatedItems);
+  };
+
+  const decreaseQuantity = (id) => {
+    const updatedItems = cartItems
+      .map(item => {
+        if (item._id === id) {
+          const newQty = item.quantity - 1;
+          return newQty > 0 ? { ...item, quantity: newQty } : null;
+        }
+        return item;
+      })
+      .filter(Boolean);
+    updateLocalStorage(updatedItems);
+  };
+
+  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleOrder = async () => {
+    if (!email || cartItems.length === 0) return;
+    try {
+      await axios.post(
+        "http://localhost:3001/api/order/addOrder",
+        {
+          products: cartItems.map(item => ({
+            productId: item._id,
+            quantity: item.quantity,
+          })),
+          total,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${keycloak.token}`,
+          }
+        }
+      );
+      setOrderPlaced(true);
+      localStorage.setItem("cart", "[]");
+      setCartItems([]);
+      window.dispatchEvent(new Event("storage"));
+    } catch (err) {
+      alert("Nie udało się złożyć zamówienia. Spróbuj ponownie!");
+    }
+  };
+
   return (
-    <div style={{
-      minHeight: "80vh",
-      background: "#f6f8fa"
-    }}>
-      <h1 style={{marginBottom: "32px", paddingTop: 32, textAlign: "center"}}>Koszyk</h1>
+    <div style={{ minHeight: "80vh", background: "#f6f8fa" }}>
+      <h1 style={{ marginBottom: "32px", paddingTop: 32, textAlign: "center", color: "black" }}>Koszyk</h1>
       <div style={{
         display: "flex",
         justifyContent: "center",
@@ -43,10 +107,7 @@ export default function Cart() {
         padding: "0 16px 48px 16px"
       }}>
         {/* Produkty po lewej */}
-        <div style={{
-          flex: 2,
-          maxWidth: 600
-        }}>
+        <div style={{ flex: 2, maxWidth: 600 }}>
           {cartItems.length === 0 ? (
             <div style={{
               background: "#fff",
@@ -83,15 +144,54 @@ export default function Cart() {
                     flex: 1,
                     display: "flex",
                     flexDirection: "column",
-                    gap: 6,
+                    gap: 8,
                     fontSize: 16,
                     alignItems: "flex-start",
                     justifyContent: "center"
                   }}>
-                    <div>
-                      <strong>Ilość:</strong> {item.quantity}
+                    <div style={{ color: "black" }}>
+                      <strong>Ilość:</strong>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+                        <button
+                          onClick={() => decreaseQuantity(item._id)}
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: 4,
+                            border: "1px solid #ccc",
+                            background: "#f1f3f5",
+                            cursor: "pointer",
+                            fontSize: 18,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: 0,
+                            lineHeight: 1,
+                            color: "black"
+                          }}
+                        >−</button>
+                        <span>{item.quantity}</span>
+                        <button
+                          onClick={() => increaseQuantity(item._id)}
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: 4,
+                            border: "1px solid #ccc",
+                            background: "#f1f3f5",
+                            cursor: "pointer",
+                            fontSize: 18,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: 0,
+                            lineHeight: 1,
+                            color: "black"
+                          }}
+                        >+</button>
+                      </div>
                     </div>
-                    <div>
+                    <div style={{ color: "black" }}>
                       <strong>Łącznie:</strong> {(item.price * item.quantity).toFixed(2)} zł
                     </div>
                   </div>
@@ -100,6 +200,7 @@ export default function Cart() {
             </div>
           )}
         </div>
+
         {/* Podsumowanie po prawej */}
         <div style={{
           flex: 1,
@@ -108,44 +209,47 @@ export default function Cart() {
           background: "#fff",
           borderRadius: 12,
           boxShadow: "0 2px 8px 0 #e7eaee60",
+          color: "black",
           padding: "32px 28px",
           position: "sticky",
           top: 40,
           alignSelf: "flex-start"
         }}>
-          <h2 style={{marginBottom: 18, fontWeight: 600, fontSize: 22}}>Podsumowanie</h2>
-          <div style={{marginBottom: 16, fontSize: 17}}>
-            <div style={{display: "flex", justifyContent: "space-between", marginBottom: 4}}>
+          <h2 style={{ marginBottom: 18, fontWeight: 600, fontSize: 22 }}>Podsumowanie</h2>
+          <div style={{ marginBottom: 16, fontSize: 17 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
               <span>Produkty:</span>
               <span>{cartItems.length}</span>
             </div>
-            <div style={{display: "flex", justifyContent: "space-between", fontWeight: 500}}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 500 }}>
               <span>Suma do zapłaty:</span>
               <span>{total.toFixed(2)} zł</span>
             </div>
           </div>
-          <hr style={{margin: "16px 0 22px 0", border: 0, borderTop: "1px solid #ececec"}} />
-          <div style={{marginBottom: 18}}>
-            <label htmlFor="order-email" style={{fontWeight: 500, fontSize: 15, marginBottom: 5, display: "block"}}>
+          <hr style={{ margin: "16px 0 22px 0", border: 0, borderTop: "1px solid #ececec" }} />
+          {/* Automatycznie pokazuj maila z Keycloaka */}
+          <div style={{ marginBottom: 18 }}>
+            <label style={{
+              fontWeight: 500,
+              fontSize: 15,
+              marginBottom: 5,
+              display: "block"
+            }}>
               Email do powiadomień:
             </label>
-            <input
-              id="order-email"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="np. jan.kowalski@email.com"
+            <div
               style={{
                 width: "100%",
                 padding: "9px 12px",
                 borderRadius: 6,
                 border: "1px solid #d3dae6",
                 fontSize: 15,
-                outline: "none",
-                marginBottom: 2,
-                background: "#f7f9fd"
+                background: "#f7f9fd",
+                color: "#222"
               }}
-            />
+            >
+              {email || <span style={{ color: "red" }}>Brak adresu e-mail w profilu</span>}
+            </div>
           </div>
           <button
             style={{
@@ -159,7 +263,8 @@ export default function Cart() {
               fontWeight: 600,
               cursor: "pointer",
               marginBottom: 10,
-              transition: "background 0.2s"
+              transition: "background 0.2s",
+              color: "white"
             }}
             disabled={!email || cartItems.length === 0 || orderPlaced}
             onClick={handleOrder}

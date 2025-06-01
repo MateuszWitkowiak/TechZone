@@ -3,7 +3,7 @@ import "./Product.css";
 function ProductCard({ product, onDelete, onEdit }) {
 
     const onClick = () => {
-        window.location.replace(`/${product._id}`)
+        window.location.replace(`/product/${product._id}`)
     }
     return (
         <div className="product-card" onClick={onClick}>

@@ -41,12 +41,13 @@ function Header() {
   };
 
   const handleOrders = () => {
-    navigate('/orders');
+    navigate(`/orders/${keycloak.tokenParsed?.preferred_username}`);
   };
   const handleLogout = () => {
     localStorage.setItem("cart", "[]");
     window.dispatchEvent(new Event("storage"));
     keycloak.logout();
+    navigate('/')
   }
 
   return (
@@ -90,7 +91,9 @@ function Header() {
           <>
             <button className="auth-button login-button" onClick={() => keycloak.login()}>Zaloguj</button>
             <button className="auth-button register-button" onClick={() => keycloak.register()}>Zarejestruj</button>
-            <button className="cart-button" onClick={handleCart}>Cart {cartSize > 0 ? `(${cartSize})` : ""}</button>
+            {keycloak.authentiaced && (
+              <button className="cart-button" onClick={handleCart}>Cart {cartSize > 0 ? `(${cartSize})` : ""}</button>
+            )}
           </>
         )}
       </div>

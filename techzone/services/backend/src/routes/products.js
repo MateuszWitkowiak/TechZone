@@ -4,6 +4,20 @@ import checkJwt from "../middleware/checkJwt.js";
 
 const router = express.Router();
 
+router.get("/getProduct/:id", async (req, res) => {
+    try {
+        const id = req.params.id;
+        const product = await Product.findById(id);
+        if (!product) {
+            return res.status(404).json({message: "Product not found"})
+        }
+        res.status(200).json(product);
+    } catch (err) {
+        console.log("BŁĄD BACKEND:", err)
+        res.status(500).json({ message: "Server error: getting product unavailable"})
+    }
+})
+
 // Pobierz wszystkie produkty
 router.get("/getAll", async (req, res) => {
     try {

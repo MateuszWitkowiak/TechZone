@@ -51,12 +51,14 @@ export default function SearchPage() {
         filtered.map(product => (
             <div key={product._id} className="product-card-wrapper">
             <ProductCard product={product} />
-            <button
+            {product.stock > 0 && (
+              <button
                 onClick={() => addToCart(product)}
                 className="add-to-cart-btn"
             >
                 Dodaj do koszyka
             </button>
+            )}
             </div>
         ))
         )}

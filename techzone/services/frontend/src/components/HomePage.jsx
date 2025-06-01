@@ -49,6 +49,10 @@ function HomePage() {
   };
 
   const addToCart = (product) => {
+    if (!keycloak.authenticated) {
+      keycloak.login()
+      return;
+    }
     const cart = JSON.parse(localStorage.getItem("cart") || "[]") ;
     cart.push(product);
 
@@ -62,6 +66,7 @@ function HomePage() {
       <div className="categories-section">
         <h2 className="categories-title">Kategorie</h2>
         <div className="categories-list">
+          <button className="category-btn" onClick={() => setCategory('')}>🛍️ Wszystkie produkty</button>
           <button className="category-btn" onClick={() => setCategory('phones')}>📱 Telefony</button>
           <button className="category-btn" onClick={() => setCategory('laptops')}>💻 Laptopy</button>
           <button className="category-btn" onClick={() => setCategory('audio')}>🎧 Audio</button>
@@ -76,7 +81,7 @@ function HomePage() {
           {products.length === 0 ? (
             <p>Brak produktów.</p>
           ) : (
-            (category === '' ? products : products.filter(product => product.category === category)).map((product) => (
+            (category === '' ? products : products.filter(product => product.category === category)).filter(product => product.stock > 0).filter(product => product.isActive).map((product) => (
               <div key={product._id} className="product-card-wrapper">
                 <ProductCard key={product._id} product={product} />
                 <button

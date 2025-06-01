@@ -5,6 +5,12 @@
   background: #f7f8fa;
   min-height: 100vh;
 }
+.categories-title {
+  color: black;
+}
+.products-title {
+  color: black;
+}
 
 .homepage-title {
   text-align: center;
