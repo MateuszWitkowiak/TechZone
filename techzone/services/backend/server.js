@@ -10,7 +10,7 @@ const app = express()
 const PORT = 3001
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: '*',
     credentials: true,
     methods: ["GET", 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-type', 'Authorization']
@@ -29,6 +29,8 @@ mongoose.connect(mongoUri)
 
 app.use("/api/order", orderRouter)
 app.use("/api/products", productsRouter)
+
+app.get('/health', (req, res) => res.status(200).send('OK'));
 
 app.listen(PORT, () => {
     console.log(`Aplikacja słucha na porcie ${PORT}`)

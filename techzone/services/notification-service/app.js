@@ -2,6 +2,7 @@ import 'dotenv/config';
 import amqp from 'amqplib';
 import nodemailer from 'nodemailer';
 
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.gmail.com",
   port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587,

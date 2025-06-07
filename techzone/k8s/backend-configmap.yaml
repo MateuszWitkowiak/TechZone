@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+data:
+  PORT: "3001"
+  NODE_ENV: "development"
+  MONGODB_CLUSTER: "cluster0.1nr7u.mongodb.net"
+  MONGODB_DBNAME: "techzone"
+  KEYCLOAK_REALM_URL: "http://keycloak:8080/realms/techzone"
+  RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672"
+  API_VERSION: "v1"
+  CORS_ORIGIN: "http://localhost:3000"
+  LOG_LEVEL: "info"

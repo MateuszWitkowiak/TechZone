@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useKeycloak } from "@react-keycloak/web";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function ProductPage() {
   const { keycloak } = useKeycloak();
   const { productId } = useParams();
@@ -13,7 +15,7 @@ export default function ProductPage() {
   useEffect(() => {
     setLoading(true);
     setNotFound(false);
-    axios.get(`http://localhost:3001/api/products/getProduct/${productId}`)
+    axios.get(`${API_URL}/api/products/getProduct/${productId}`)
       .then(res => {
         if (!res.data || !res.data._id) {
           setNotFound(true);

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useKeycloak } from "@react-keycloak/web";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function OrdersPage() {
   const { keycloak } = useKeycloak();
   const [orders, setOrders] = useState([]);
@@ -15,7 +17,7 @@ export default function OrdersPage() {
       setError("");
       try {
         const response = await axios.get(
-          "http://localhost:3001/api/order/getUserOrders",
+          `${API_URL}/api/order/getUserOrders`,
           {
             headers: {
               Authorization: `Bearer ${keycloak.token}`,

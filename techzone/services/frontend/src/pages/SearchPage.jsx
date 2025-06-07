@@ -4,6 +4,8 @@ import axios from "axios";
 import ProductCard from "../components/Product/Product";
 import "./SearchPage.css"
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function SearchPage() {
   const { query } = useParams();
   const [products, setProducts] = useState([]);
@@ -13,7 +15,7 @@ export default function SearchPage() {
     const fetchProducts = async () => {
       setMessage("");
       try {
-        const response = await axios.get("http://localhost:3001/api/products/getAll");
+        const response = await axios.get(`${API_URL}/api/products/getAll`);
         setProducts(response.data);
       } catch (err) {
         setMessage("Błąd podczas pobierania produktów.");

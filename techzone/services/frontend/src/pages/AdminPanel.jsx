@@ -4,6 +4,8 @@ import { useKeycloak } from "@react-keycloak/web";
 import ProductCard from "../components/Product/Product";
 import "./AdminPanel.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function AdminPanel() {
     const [orders, setOrders] = useState([]);
     const [products, setProducts] = useState([]);
@@ -56,7 +58,7 @@ function AdminPanel() {
         setMessage("");
         try {
             const response = await axios.get(
-                "http://localhost:3001/api/order/getAll",
+                `${API_URL}/api/order/getAll`,
                 await axiosConfig()
             );
             setOrders(response.data);
@@ -68,7 +70,7 @@ function AdminPanel() {
 
     const deleteOrder = async (orderId) => {
         try {
-            const response = await axios.delete(`http://localhost:3001/api/order/delete/${orderId}`, await axiosConfig())
+            const response = await axios.delete(`${API_URL}/api/order/delete/${orderId}`, await axiosConfig())
             setMessage("Zamówienie usunięte!")
             setOrders(prev => prev.filter(order => order._id != orderId))
         } catch (err) {
@@ -80,7 +82,7 @@ function AdminPanel() {
         setMessage("");
         try {
             const response = await axios.get(
-                "http://localhost:3001/api/products/getAll",
+                `${API_URL}/api/products/getAll`,
                 await axiosConfig()
             );
             setProducts(response.data);
@@ -93,7 +95,7 @@ function AdminPanel() {
     const deleteProduct = async (id) => {
         try {
             await axios.delete(
-                `http://localhost:3001/api/products/delete/${id}`,
+                `${API_URL}/api/products/delete/${id}`,
                 await axiosConfig()
             );
             setMessage("Produkt usunięty!");
@@ -142,14 +144,14 @@ function AdminPanel() {
 
             if (editingProduct) {
                 await axios.put(
-                    `http://localhost:3001/api/products/update/${editingProduct._id}`,
+                    `${API_URL}/api/products/update/${editingProduct._id}`,
                     payload,
                     await axiosConfig()
                 );
                 setMessage("Produkt zaktualizowany!");
             } else {
                 await axios.post(
-                    "http://localhost:3001/api/products/addProduct",
+                    `${API_URL}/api/products/addProduct`,
                     payload,
                     await axiosConfig()
                 );
@@ -205,7 +207,7 @@ function AdminPanel() {
         setMessage("");
         try {
             await axios.put(
-                `http://localhost:3001/api/order/updateStatus/${orderId}`,
+                `${API_URL}/api/order/updateStatus/${orderId}`,
                 { status: orderStatusUpdates[orderId] },
                 await axiosConfig()
             );

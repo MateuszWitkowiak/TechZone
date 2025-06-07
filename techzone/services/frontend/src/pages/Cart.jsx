@@ -4,6 +4,8 @@ import ProductCard from "../components/Product/Product";
 import { useKeycloak } from "@react-keycloak/web";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [orderPlaced, setOrderPlaced] = useState(false);
@@ -70,7 +72,7 @@ export default function Cart() {
     if (!email || cartItems.length === 0) return;
     try {
       await axios.post(
-        "http://localhost:3001/api/order/addOrder",
+        `${API_URL}/api/order/addOrder`,
         {
           products: cartItems.map(item => ({
             productId: item._id,

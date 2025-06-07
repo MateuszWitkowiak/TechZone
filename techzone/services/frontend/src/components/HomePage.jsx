@@ -4,6 +4,8 @@ import { useKeycloak } from "@react-keycloak/web";
 import ProductCard from "../components/Product/Product";
 import "./Homepage.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function HomePage() {
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState("");
@@ -38,7 +40,7 @@ function HomePage() {
     setMessage("");
     try {
       const response = await axios.get(
-        "http://localhost:3001/api/products/getAll",
+        `${API_URL}/api/products/getAll`,
         await axiosConfig()
       );
       setProducts(response.data);
