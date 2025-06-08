@@ -68,10 +68,10 @@ function HomePage() {
         <h2 className="categories-title">Kategorie</h2>
         <div className="categories-list">
           <button className="category-btn" onClick={() => setCategory('')}>🛍️ Wszystkie produkty</button>
-          <button className="category-btn" onClick={() => setCategory('phones')}>📱 Telefony</button>
+          <button className="category-btn" onClick={() => setCategory('smartphones')}>📱 Telefony</button>
           <button className="category-btn" onClick={() => setCategory('laptops')}>💻 Laptopy</button>
-          <button className="category-btn" onClick={() => setCategory('audio')}>🎧 Audio</button>
           <button className="category-btn" onClick={() => setCategory('tablets')}>📱 Tablety</button>
+          <button className="category-btn" onClick={() => setCategory('gaming')}>🎮 Gaming</button>
           <button className="category-btn" onClick={() => setCategory('accessories')}>🔌 Akcesoria</button>
         </div>
       </div>
@@ -85,12 +85,14 @@ function HomePage() {
             (category === '' ? products : products.filter(product => product.category === category)).filter(product => product.stock > 0).filter(product => product.isActive).map((product) => (
               <div key={product._id} className="product-card-wrapper">
                 <ProductCard key={product._id} product={product} />
+                {!keycloak.hasRealmRole("admin") && (
                 <button
-                  onClick={() => addToCart(product)}
-                  className="add-to-cart-btn"
+                onClick={() => addToCart(product)}
+                className="add-to-cart-btn"
                 >
                   Dodaj do koszyka
                 </button>
+                )}
               </div>
             ))
           )}

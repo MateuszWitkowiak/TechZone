@@ -105,7 +105,7 @@ export default function ProductPage() {
           <span style={{ color: product.stock > 0 ? "#2980b9" : "#c0392b", display: "flex", flexDirection: "column", alignContent: "center", justifyContent: "center", alignItems: "center" }}>
             {product.stock > 0 ? product.stock : "Brak w magazynie"} <br></br>
             {!product.isActive && <div style={{color: "red"}}>Produkt obecnie niedostępny</div> }
-            {product.stock > 0 && product.isActive && (
+            {product.stock > 0 && product.isActive && !keycloak.hasRealmRole("admin") && (
               <button
                   onClick={() => addToCart(product)}
                   className="add-to-cart-btn"

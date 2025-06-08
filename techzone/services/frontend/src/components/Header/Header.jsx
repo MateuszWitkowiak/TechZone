@@ -85,14 +85,16 @@ function Header() {
             {!keycloak.hasRealmRole('admin') && (
               <button className="orders-button" onClick={handleOrders}>Zamówienia</button>
             )}
-            <button className="cart-button" onClick={handleCart}>Cart {cartSize > 0 ? `(${cartSize})` : ""}</button>
+            {!keycloak.hasRealmRole("admin") && (
+              <button className="cart-button" onClick={handleCart}>Cart {cartSize > 0 ? `(${cartSize})` : ""}</button>
+            )}
             <button className="auth-button logout-button" onClick={handleLogout}>Wyloguj</button>
           </>
         ) : (
           <>
             <button className="auth-button login-button" onClick={() => keycloak.login()}>Zaloguj</button>
             <button className="auth-button register-button" onClick={() => keycloak.register()}>Zarejestruj</button>
-            {keycloak.authentiaced && (
+            {keycloak.authentiaced && !keycloak.hasRealmRole("admin") (
               <button className="cart-button" onClick={handleCart}>Cart {cartSize > 0 ? `(${cartSize})` : ""}</button>
             )}
           </>
